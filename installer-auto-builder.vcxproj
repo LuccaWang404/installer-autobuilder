@@ -132,6 +132,17 @@
     <ClCompile Include="github_api.cpp" />
     <ClCompile Include="installer-auto-builder.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="resource1.h" />
+    <ClInclude Include="resource2.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="installer-auto-builder.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="J:\ryujinx-new-installers\Ryujinx.ico" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

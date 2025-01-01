@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <windows.h>
+#include <io.h>
 #include "include/rapidjson/document.h"
 #include "include/rapidjson/stringbuffer.h"
 #include "include/rapidjson/writer.h"
@@ -9,6 +10,10 @@
 #include "include/rapidjson/filewritestream.h"
 #include "include/rapidjson/filereadstream.h"
 #include "include/rapidjson/prettywriter.h"
+
+#define RW 06
+#define R 04
+#define W 02
 
 using namespace std;
 using namespace rapidjson;
@@ -32,7 +37,7 @@ int ReadHistoryVersionNum() {
 
 }
 
-//编译后清理临时文件、向控制台输出最后编译版本并将最后编译版本写入到config.json
+//编译后清理临时文件并向控制台输出最后编译版本
 void CleanAndFinish() {
 
 	cout << "\033[32mCleaning temporary .iss file... \033[0m" << endl;
@@ -48,11 +53,19 @@ void CompileAndBackup(int head_version, int end_version) {
 	string tagHead = endTag.substr(0, 4);
 	system("md Archives");
 	system("md Source.Backup");
-	string removePreviousRepo, cloneRemoteRepo;
+	string removePreviousRepo, cloneRemoteRepo, pullRemoteRepo;
 	removePreviousRepo = "rmdir /s /q " + repo;
 	cloneRemoteRepo = gitBin + " clone " + baseURLHeadFinal + owner + "/" + repo;
-	system(removePreviousRepo.c_str());
-	system(cloneRemoteRepo.c_str());
+	pullRemoteRepo = "cd "+ repo + " && \..\\"+ gitBin + " pull && cd ..";
+	if (_access(repo.c_str(), RW) == 0) {
+		cout << "\033[32mR/W project repository found. Pulling changes...\033[0m" << endl;
+		system(pullRemoteRepo.c_str());
+	}
+	else {
+		cout << "\033[0m\033[1;31mNo R/W project repository found! Cloning into " + repo + "...\033[0m" << endl;
+		system(removePreviousRepo.c_str());
+		system(cloneRemoteRepo.c_str());
+	}
 	for (i = head_version; i <= end_version; i++) {
 		cout << "\033[34m\033[1mLoop number: " << i << "\033[0m" << endl << endl;
 		string versionNum = to_string(i), releaseName, extractFolderName, dlRelease, dlSrcArchive, backupSrcArchive, extractRelease, insertVersionInfo, typeTMPScript, compileInstallerEXE, cleanTMP, backupRelease;
